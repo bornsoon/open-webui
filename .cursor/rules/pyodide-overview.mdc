@@ -1,0 +1,36 @@
+# Open WebUI Pyodide (Browser-side Python) 기술 분석
+
+## 🐍 Pyodide란?
+**Pyodide**는 CPython을 **WebAssembly(Wasm)**로 포팅하여, 브라우저 환경에서 Python 코드를 직접 실행할 수 있게 해주는 기술입니다.
+Open WebUI는 이를 활용하여 별도의 백엔드 연산 없이 클라이언트(브라우저) 측에서 Python 코드를 실행하고 결과를 시각화합니다.
+
+## 💡 주요 사용 목적
+1.  **클라이언트 사이드 코드 실행 (Client-side Code Execution)**
+    *   사용자가 채팅창에 입력한 Python 코드를 브라우저 내에서 즉시 실행합니다. (Code Interpreter 기능)
+    *   서버(Backend)의 리소스를 사용하지 않아 서버 부하를 줄입니다.
+    *   사용자의 데이터가 서버로 전송되지 않고 로컬에서 처리되므로 보안성이 높습니다.
+
+2.  **데이터 시각화 및 분석**
+    *   `pandas`, `matplotlib` 등을 이용해 데이터를 즉석에서 가공하고 그래프를 그려 보여줍니다.
+
+## 🛠️ 구현 상세 (Implementation Details)
+
+### 1. 사전 준비 (`scripts/prepare-pyodide.js`)
+*   프론트엔드 빌드/실행 시(`npm run pyodide:fetch`) 실행됩니다.
+*   Pyodide 런타임과 주요 패키지(`numpy`, `pandas`, `scikit-learn` 등)의 `.whl` 파일을 미리 다운로드하여 `static/pyodide/` 디렉토리에 캐싱합니다.
+*   이는 오프라인 환경에서도 동작할 수 있도록 보장합니다.
+
+### 2. 웹 워커 활용 (`src/lib/workers/pyodide.worker.ts`)
+*   Python 실행은 메인 스레드를 차단하지 않도록 **Web Worker**에서 별도로 구동됩니다.
+*   `CodeBlock.svelte` 등의 컴포넌트가 워커와 메시지를 주고받으며 코드를 실행하고 결과(stdout/stderr)를 받습니다.
+
+### 3. 포함된 주요 라이브러리
+Open WebUI는 데이터 과학 및 분석을 위해 다음 라이브러리들을 기본적으로 캐싱합니다:
+*   **수치/데이터**: `numpy`, `pandas`, `scipy`
+*   **시각화**: `matplotlib`, `seaborn`
+*   **머신러닝**: `scikit-learn`
+*   **기타**: `beautifulsoup4` (파싱), `requests` (요청), `openai`, `regex`, `sympy` 등
+
+## ⚠️ 주의 사항
+*   **초기 로딩**: 처음 접속 시 Pyodide 엔진과 라이브러리를 다운로드해야 하므로 초기 로딩에 시간이 조금 걸릴 수 있습니다. (로그에 `Fetching files...`가 뜨는 이유)
+*   **브라우저 리소스**: 코드 실행이 사용자 브라우저의 CPU/RAM을 사용하므로, 무거운 연산은 클라이언트 기기 성능에 영향을 받습니다.

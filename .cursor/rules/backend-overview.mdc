@@ -1,0 +1,52 @@
+# Open WebUI 백엔드 분석
+
+## 🏗️ 아키텍처 개요
+백엔드는 비즈니스 로직 처리, 데이터베이스 연동, AI 모델 오케스트레이션을 담당하는 견고한 API 서버입니다. 확장성과 비동기 처리를 최우선으로 설계되었습니다.
+
+## 🛠️ 기술 스택 (Technology Stack)
+
+### 핵심 프레임워크 (Core Frameworks)
+- **Framework**: **FastAPI**
+  - Python 3.11+ 기반의 현대적이고 고성능인 웹 프레임워크입니다.
+  - API 문서(Swagger UI)가 자동으로 생성되어 개발 편의성이 높습니다.
+- **Language**: **Python (3.11+)**
+  - AI 및 머신러닝 생태계와의 호환성이 뛰어난 표준 언어입니다.
+
+### 데이터베이스 및 스토리지 (Database & Storage)
+**Open WebUI는 두 가지 유형의 데이터베이스를 동시에 사용하여 데이터를 효율적으로 관리합니다.**
+
+1.  **Relational DB (관계형 데이터베이스)**:
+    *   **SQLite** (`webui.db`): 기본값으로 사용되며, 사용자 정보, 채팅 기록, 설정 등 정형 데이터를 저장합니다. 별도 서버 설치 없이 파일로 관리되어 간편합니다.
+    *   **ORM**: `SQLAlchemy`와 `Peewee`를 혼용하여 사용 중입니다. (`alembic` 및 `peewee-migrate`로 마이그레이션 관리)
+    
+2.  **Vector DB (벡터 데이터베이스)**:
+    *   **ChromaDB** (`vector_db/`): RAG(검색 증강 생성)를 위한 임베딩 벡터 데이터를 저장합니다. SQLite와 마찬가지로 내장형(Embedded)으로 동작하여 파일 기반으로 데이터를 관리합니다.
+    *   **pgvector**: (옵션) 대규모 운영 시 PostgreSQL의 확장 기능인 `pgvector`를 사용할 수도 있습니다.
+- **Validation**: **Pydantic**
+  - FastAPI에서 데이터 검증 및 설정(Settings) 관리에 핵심적으로 사용됩니다.
+
+### AI 및 LLM 연동 (AI & LLM Integration)
+- **Orchestration**: **LangChain**
+  - LLM 애플리케이션(체인, 에이전트, 리트리버 등) 구축을 위한 핵심 프레임워크입니다.
+- **Model Client**: `openai`, `anthropic`, `google-genai`
+  - 주요 LLM 제공업체와 연동하기 위한 공식 SDK들입니다.
+- **Local Inference**: Ollama와 같은 로컬 모델과의 연동을 지원하는 일반적인 OpenAI 호환 엔드포인트를 제공합니다.
+
+### 실시간 및 비동기 (Real-time & Async)
+- **Socket.IO**: `python-socketio`
+  - 실시간 채팅 스트리밍과 같은 양방향 이벤트 통신을 지원합니다.
+- **AsyncIO**: Non-blocking I/O 처리를 위해 백엔드 전반에서 비동기 프로그래밍이 적극 활용됩니다.
+
+### 인증 및 보안 (Authentication & Security)
+- **Auth**:
+  - `python-jose` / `PyJWT`: JWT (JSON Web Tokens) 처리 및 검증.
+  - `bcrypt` / `argon2-cffi`: 안전한 비밀번호 해싱 알고리즘.
+  - 다양한 OAuth 연동 라이브러리를 포함합니다.
+
+## 📂 주요 디렉토리 구조 (`backend/open_webui/`)
+- `main.py`: 애플리케이션의 진입점(Entry Point).
+- `routers/`: 도메인별로 정리된 API 라우트 정의.
+- `models/`: 데이터베이스 스키마 정의 (Pydantic 모델 및 ORM 클래스).
+- `retrieval/`: RAG(검색 증강 생성), 벡터 DB 검색, 문서 처리 관련 로직.
+- `utils/`: 공통 유틸리티 함수 및 헬퍼 모듈.
+- `config.py`: 환경 설정 관리 (Pydantic Settings 활용 추정).

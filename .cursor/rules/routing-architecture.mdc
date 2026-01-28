@@ -1,0 +1,33 @@
+# Open WebUI 라우팅 아키텍처 (Routing Architecture)
+
+## 🧭 개요
+Open WebUI는 **SvelteKit** 프레임워크를 기반으로 구축되어, **파일 시스템 기반 라우팅 (File System-based Routing)** 방식을 사용합니다.
+별도의 라우터 라이브러리(예: `react-router`, `svelte-routing`)를 사용하지 않으며, `src/routes` 디렉토리의 구조가 곧 애플리케이션의 URL 경로가 됩니다.
+
+## 📂 라우팅 규칙
+SvelteKit의 라우팅은 `src/routes` 폴더 내의 디렉토리 구조와 파일명에 따라 결정됩니다.
+
+### 1. 기본 파일 규칙
+*   **`+page.svelte`**: 해당 경로의 UI(페이지)를 정의합니다.
+    *   예: `src/routes/+page.svelte` → `/` (메인 페이지)
+    *   예: `src/routes/auth/+page.svelte` → `/auth` (로그인 페이지 등)
+*   **`+layout.svelte`**: 해당 경로와 그 하위 경로에 공통적으로 적용될 레이아웃(헤더, 사이드바 등)을 정의합니다.
+    *   예: `src/routes/+layout.svelte` → 모든 페이지에 적용되는 최상위 레이아웃
+*   **`+server.ts`**: 해당 경로에 대한 API 엔드포인트(GET, POST 등)를 정의할 때 사용합니다. (Open WebUI는 주로 FastAPI를 백엔드로 쓰지만, 프론트엔드 자체 API가 필요할 때 사용됨)
+
+### 2. 동적 라우팅 (Dynamic Routing)
+폴더 이름에 대괄호(`[]`)를 사용하면 동적 파라미터를 받을 수 있습니다.
+*   예: `src/routes/c/[chat_id]/+page.svelte`
+    *   URL 매칭: `/c/123`, `/c/abc-def`
+    *   페이지 내에서 `chat_id` 파라미터로 접근 가능
+
+### 3. 그룹화 (Grouping)
+폴더 이름이 소괄호(`()`)로 감싸져 있으면 URL 경로에는 영향을 주지 않고 그룹화만 합니다.
+*   예: `src/routes/(app)/dashboard/+page.svelte` → URL은 `/dashboard` (`(app)`은 생략됨)
+*   이를 통해 레이아웃을 다르게 적용하고 싶을 때 유용합니다.
+
+## 📍 Open WebUI의 주요 경로 예시 (추론)
+*   `/`: 메인 채팅 화면 (`src/routes/+page.svelte`)
+*   `/auth`: 로그인/회원가입 (`src/routes/auth/+page.svelte`)
+*   `/admin`: 관리자 페이지 (`src/routes/admin/...`)
+*   `/c/[id]`: 특정 채팅방 화면

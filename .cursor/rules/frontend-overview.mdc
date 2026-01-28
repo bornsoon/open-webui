@@ -1,0 +1,48 @@
+# Open WebUI 프론트엔드 분석
+
+## 🏗️ 아키텍처 개요
+프론트엔드는 반응형 웹 애플리케이션(SPA)으로 구축되었으며, REST API와 WebSocket을 통해 백엔드와 통신하여 사용자에게 인터랙티브한 경험을 제공합니다.
+
+## 🛠️ 기술 스택 (Technology Stack)
+
+### 핵심 프레임워크 (Core Frameworks)
+- **Framework**: **SvelteKit** (Svelte 5 기반)
+  - 가볍고 빠른 반응성을 제공하는 UI 프레임워크입니다.
+  - `src/routes` 기반의 라우팅과 필요에 따른 서버 사이드 렌더링(SSR)을 처리합니다.
+- **Language**: **TypeScript**
+  - 정적 타입 검사를 통해 코드의 안정성을 높이고 개발 효율을 향상시켰습니다.
+- **Build Tool**: **Vite**
+  - 매우 빠른 개발 서버 구동(HMR)과 최적화된 프로덕션 빌드를 지원합니다.
+
+### UI 및 스타일링 (UI & Styling)
+- **Styling**: **Tailwind CSS (v4)**
+  - Utility-first 접근 방식의 CSS 프레임워크로, 빠르고 일관된 디자인 시스템을 구축했습니다.
+  - `@tailwindcss/postcss`를 통해 설정됩니다.
+- **Icons**: (일반적인 관행으로 보아) Tailwind 호환 아이콘 라이브러리(Lucide, Heroicons 등)를 사용할 것으로 추정됩니다.
+
+### 상태 관리 및 로직 (State Management & Logic)
+- **State Management**: Svelte 내장 Store 기능을 주로 사용하며, 필요한 라이브러리별 스토어(예: `i18next`)를 보조적으로 활용합니다.
+- **Internationalization (i18n)**: `i18next`
+  - 강력한 다국어 지원 라이브러리입니다.
+- **Date Handling**: `dayjs`
+  - 날짜 포맷팅 및 조작을 위한 경량 라이브러리입니다.
+
+### 주요 라이브러리 및 기능 (Key Libraries & Features)
+- **Rich Text Editor**: `tiptap`
+  - Notion 스타일의 편집 경험을 제공하는 ProseMirror 기반의 헤드리스 에디터입니다.
+- **Code Editor**: `codemirror`
+  - 문법 강조(Syntax Highlighting) 기능을 포함한 코드 에디터입니다.
+- **Visualization**:
+  - `chart.js`: 데이터 시각화 및 차트 렌더링을 담당합니다.
+  - `mermaid`: 텍스트 설명을 다이어그램으로 변환하여 보여줍니다.
+- **Math Rendering**: `katex`
+  - 수식 렌더링을 빠르게 처리합니다.
+- **Real-time Communication**: `socket.io-client`
+  - 백엔드와의 실시간 채팅 스트리밍 및 상태 업데이트를 위해 사용됩니다.
+- **Browser-side Python**: `pyodide`
+  - 웹브라우저(WebAssembly) 환경 내에서 Python 코드를 직접 실행할 수 있게 해줍니다.
+
+## 📂 주요 디렉토리 구조 (추론)
+- `src/routes`: SvelteKit의 페이지 및 API 라우트 정의.
+- `src/lib`: 재사용 가능한 컴포넌트, 유틸리티 함수, 스토어 등이 위치.
+- `src/static`: 이미지, 폰트 등 정적 자산(Assets).
